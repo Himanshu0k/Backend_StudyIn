@@ -9,14 +9,6 @@ const routers = require('./routes/routes.js');
 // Middleware for JSON
 app.use(express.json());
 
-// Logger Middleware
-app.use((req, res, next) => {
-    const message = `${req.method} ${req.url}`;
-    console.log(message);
-    res.setHeader('X-Request-Id', message); // Example of adding a custom header
-    next();
-});
-
 // Use student routes
 app.use('/', routers);
 

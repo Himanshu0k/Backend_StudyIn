@@ -12,13 +12,13 @@ const express = require('express'); // used to set up routing for the applicatio
 const router = express.Router(); // creating new instance of a express router
 
 const studentController = require('./student.controller');
-const validateStudent = require('./student.validation');
+const { validateStudent, validateStudentUpdate} = require('./student.validation');
 
 // Define routes
 router.post('/', validateStudent, studentController.addStudent);
 router.get('/', studentController.fetchAllStudents);
 router.get('/:id', studentController.fetchStudentById);
 router.delete('/:id', studentController.removeStudentById);
-router.patch('/:id', studentController.updateStudentById);
+router.patch('/:id', validateStudentUpdate, studentController.updateStudentById);
 
 module.exports = router;

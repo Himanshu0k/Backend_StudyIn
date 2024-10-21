@@ -12,9 +12,9 @@ const express = require('express'); // used to set up routing for the applicatio
 const router = express.Router(); // creating new instance of a express router
 
 const loginController = require('./login.controller');
+const loginValidator = require('./login.validation');
 
 // Define routes
-router.post('/', loginController.login);
-// router.get('/', loginController.verifyToken);
+router.post('/',loginValidator, loginController.login);
 
 module.exports = router;
