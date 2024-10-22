@@ -1,9 +1,10 @@
+/* global process */
 // controllers/login.controller.js
 
-const { body } = require('express-validator');
-const jwt = require('jsonwebtoken');
+import {} from 'express-validator';
+import jwt from 'jsonwebtoken';
 
-const {successResponse, errorResponse} = require('../../libs/response');
+import response from '../../libs/response.js';
 
 const loginController = {
    login: (req, res) => {
@@ -16,18 +17,18 @@ const loginController = {
 
        // Check if the username matches the one from .env
        if (username !== ENV_USERNAME) {
-            errorResponse(res, 'Invalid Username');
+            response.errorResponse(res, 'Invalid Username');
        }
 
        // Check if the password matches the one from .env
        if (password !== ENV_PASSWORD) {
-            errorResponse(res, 'Invalid Password');
+            response.errorResponse(res, 'Invalid Password');
        }
 
        // Generate JWT token upon successful login
        const token = jwt.sign({ username }, SECRET_KEY, { expiresIn: '1h' });
-       successResponse(res, 'Login successful', token);
+       response.successResponse(res, 'Login successful', token);
    }
 };
 
-module.exports = loginController;
+export default loginController;

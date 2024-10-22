@@ -8,11 +8,11 @@ This file is used for
 
 */
 
-const express = require('express'); // used to set up routing for the application
+import express from 'express'; // used to set up routing for the application
 const router = express.Router(); // creating new instance of a express router
 
-const studentController = require('./student.controller');
-const { validateStudent, validateStudentUpdate} = require('./student.validation');
+import studentController from './student.controller.js';
+import { validateStudent, validateStudentUpdate } from './student.validation.js';
 
 // Define routes
 router.post('/', validateStudent, studentController.addStudent);
@@ -21,4 +21,4 @@ router.get('/:id', studentController.fetchStudentById);
 router.delete('/:id', studentController.removeStudentById);
 router.patch('/:id', validateStudentUpdate, studentController.updateStudentById);
 
-module.exports = router;
+export default router;

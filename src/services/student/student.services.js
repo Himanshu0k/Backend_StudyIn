@@ -40,4 +40,4 @@ class StudentService {
     }
 }
 
-module.exports = new StudentService(); // Export an instance of the model
+export default new StudentService(); // Export an instance of the model

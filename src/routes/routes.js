@@ -1,17 +1,17 @@
 // routes/studentRoutes.js
 
 
-const express = require('express'); // creating an instance of an express router
+import express from 'express'; // creating an instance of an express router
 const router = express.Router(); // router allows to define multiple end points
 
-const studentRoutes = require('../controllers/students/student.route');
-const teacherRoutes = require('../controllers/teachers/teacher.route')
+import studentRoutes from '../controllers/students/student.route.js';
+import teacherRoutes from '../controllers/teachers/teacher.route.js';
 
-const tokenVerification = require('../libs/middleware/tokenVerification')
+import tokenVerification from '../libs/middleware/tokenVerification.js';
 
-const loginRoutes = require('../controllers/login/login.route')
+import loginRoutes from '../controllers/login/login.route.js';
 
-const {successResponse, errorResponse} = require('../libs/response');
+import response from '../libs/response.js';
 
 // used to mount the imported routers to specific base path
 router.use("/students", tokenVerification, studentRoutes)
@@ -28,12 +28,12 @@ router.get('/health', (req, res) => {
    // };
 
    // res.status(200).json(healthStatus);
-   successResponse(res, 'server is healthy', new Date().toISOString());
+   response.successResponse(res, 'server is healthy', new Date().toISOString());
 });
 
 router.use((req, res) => {
    // res.status(404).json({ status: 404, error: 'Invalid route. Only "students" and "teachers" endpoint are supported.' });
-   errorResponse(res, 'Invalid route. Only "students" and "teachers" endpoint are supported.')
+   response.errorResponse(res, 'Invalid route. Only "students" and "teachers" endpoint are supported.')
 });
 
-module.exports = router;
+export default router;

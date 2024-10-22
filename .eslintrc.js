@@ -1,15 +1,20 @@
-// eslint-disable-next-line no-undef
-module.exports = {
-   env: {
-     node: true, // Enable Node.js global variables and Node.js scoping
-     es2021: true, // Enable modern ECMAScript features
-   },
-   extends: [
-     'eslint:recommended', // Use ESLint's recommended rules
-   ],
-   parserOptions: {
-     ecmaVersion: 6, // ECMAScript 2021
-     sourceType: 'script', // Use 'module' if you're using ES Modules
-   }
- };
- 
+// .eslintrc.js
+
+export default {
+  env: {
+      browser: true,
+      es2021: true,
+      node: true, // This line allows Node.js globals
+  },
+  extends: [
+      'eslint:recommended',
+      'plugin:prettier/recommended', // If you're using Prettier
+  ],
+  parserOptions: {
+      ecmaVersion: 12,
+      sourceType: 'module', // Use this for ES modules
+  },
+  rules: {
+      // Customize your rules here
+  },
+};

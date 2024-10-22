@@ -1,6 +1,6 @@
 // validations/login.validation.js
 
-const { body } = require('express-validator');
+import { body } from 'express-validator';
 
 const loginValidation = [
     body('username')
@@ -12,4 +12,4 @@ const loginValidation = [
         .isString().withMessage('Password must be a string.')
 ];
 
-module.exports = loginValidation;
+export default loginValidation;

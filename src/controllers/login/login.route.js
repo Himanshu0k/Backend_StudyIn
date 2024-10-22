@@ -8,13 +8,13 @@ This file is used for
 
 */
 
-const express = require('express'); // used to set up routing for the application
+import express from 'express'; // used to set up routing for the application
 const router = express.Router(); // creating new instance of a express router
 
-const loginController = require('./login.controller');
-const loginValidator = require('./login.validation');
+import loginController from './login.controller.js';
+import loginValidator from './login.validation.js';
 
 // Define routes
 router.post('/',loginValidator, loginController.login);
 
-module.exports = router;
+export default router;

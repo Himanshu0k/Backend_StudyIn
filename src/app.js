@@ -1,10 +1,13 @@
+/* global process */
 // app.js
 
-require('dotenv').config();
-const express = require('express');
+import dotenv from 'dotenv';
+dotenv.config();
+
+import express from 'express';
 const app = express();
 const port = process.env.PORT;
-const routers = require('./routes/routes.js');
+import routers from './routes/routes.js';
 
 // Middleware for JSON
 app.use(express.json());

@@ -1,7 +1,7 @@
 // Validation middleware
-const { check, validationResult } = require('express-validator'); // importing express validator
+import { check, validationResult } from 'express-validator'; // importing express validator
 
-const {successResponse, errorResponse} = require('../../libs/response');
+import response from '../../libs/response.js';
 
 // The validateTeacher middleware contains a series of validation checks for the incoming request fields.
 const validateTeacher = [
@@ -39,10 +39,10 @@ const validateTeacher = [
   (req, res, next) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
-      return errorResponse(res, errors.array().map(error => error.msg));
+      return response.errorResponse(res, errors.array().map(error => error.msg));
     }
     next();
   }
 ];
 
-module.exports = validateTeacher;
+export default validateTeacher;
