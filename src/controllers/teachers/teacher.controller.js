@@ -1,12 +1,11 @@
 import teacherModel from '../../services/teacher/teacher.services.js';
-
 import response from '../../libs/response.js';
+import authenticate from '../../libs/middleware/authorization.js'; // Import the authentication module
 
 const teacherController = {
     addTeacher: (req, res) => {
-        // Retrieve the current maximum ID from the teacherModel
-        const teachers = teacherModel.getAllTeachers(); // Assuming this function returns all teachers
-        const id = teachers.length > 0 ? Math.max(...teachers.map(t => t.id)) + 1 : 1;
+        const teachers = teacherModel.getAllTeachers(); // Get all teachers
+        const id = teachers.length > 0 ? Math.max(...teachers.map(t => t.id)) + 1 : 1; // Finding the max ID
 
         let { name, address, gender, subject_name } = req.body;
 
@@ -38,10 +37,15 @@ const teacherController = {
 
     fetchTeacherById: (req, res) => {
         const teacher = teacherModel.getTeacherById(parseInt(req.params.id));
+
+        let task = req.body.task; // Assuming 'task' is part of the request body
+
+        task = authenticate.teacherRead(task); // Authenticate permissions
+        
         if (!teacher) {
             return response.errorResponse(res, 'Teacher not found, Invalid teacher ID');
         }
-        return response.successResponse(res, 'Fetched single teacher details successfully', teacher);
+        return response.successResponse(res, 'Fetched single teacher details successfully , ' + task, teacher);
     },
 
     removeTeacherById: (req, res) => {
@@ -53,8 +57,12 @@ const teacherController = {
     },
 
     updateTeacherById: (req, res) => {
-        const allowedFields = ['name', 'address', 'gender', 'subject_name'];
+        const allowedFields = ['name', 'address', 'gender', 'subject_name', 'task'];
         const updatedData = req.body;
+        
+        let task = req.body.task; // Assuming 'task' is part of the request body
+
+        task = authenticate.teacherWrite(task); // Authenticate permissions
 
         // Find the teacher by ID
         const teacher = teacherModel.getTeacherById(parseInt(req.params.id));
@@ -62,62 +70,32 @@ const teacherController = {
             return response.errorResponse(res, 'Teacher not found, Invalid teacher ID');
         }
 
-        // Define valid genders
-        const validGenders = ['male', 'female', 'others'];
-
         // Validate and update only the fields that are present in the request body
-        Object.keys(updatedData).forEach(key => {
+        for (const key of Object.keys(updatedData)) {
             // Restrict changes to "id"
             if (key === 'id') {
-                return response.errorResponse(res, 'You cannot change the "id".');
+                return response.errorResponse(res, 'You cannot change the id');
             }
 
-            // Validate and update name if present
-            if (key === 'name') {
-                if (!updatedData[key].trim() || updatedData[key].trim().length < 3 || /\d/.test(updatedData[key]) || /[^a-zA-Z\s]/.test(updatedData[key])) {
-                    return response.errorResponse(res, 'Invalid name: "name" should be a string with at least 3 characters and no numbers or special characters.');
-                }
-                teacher[key] = updatedData[key].trim().toLowerCase();
-            }
+            // Validate and update each allowed field
+            if (allowedFields.includes(key)) {
+                updatedData[key] = updatedData[key].trim().toLowerCase(); // Normalize input
 
-            // Validate and update address if present
-            if (key === 'address') {
-                if (!updatedData[key].trim() || updatedData[key].trim().length < 3 || /^\d+$/.test(updatedData[key]) || /[^a-zA-Z0-9\s]/.test(updatedData[key])) {
-                    return response.errorResponse(res, 'Invalid address: "address" should not contain only numbers or special characters and should be at least 3 characters long.');
-                }
-                teacher[key] = updatedData[key].trim().toLowerCase();
-            }
-
-            // Validate and update gender if present
-            if (key === 'gender') {
-                if (!validGenders.includes(updatedData[key].toLowerCase())) {
-                    return response.errorResponse(res, 'Invalid gender: "gender" should be one of "male", "female", "others".');
-                }
-                teacher[key] = updatedData[key].trim().toLowerCase();
-            }
-
-            // Validate and update subject_name if present
-            if (key === 'subject_name') {
-                if (!updatedData[key].trim() || updatedData[key].trim().length < 3 || /^[0-9]+$/.test(updatedData[key]) || /[^a-zA-Z\s]/.test(updatedData[key])) {
-                    return response.errorResponse(res, 'Invalid subject_name: "subject_name" should contain only characters and be at least 3 characters long.');
-                }
-                teacher[key] = updatedData[key].trim().toLowerCase();
-            }
-
-            // Reject any fields that are not allowed
-            if (!allowedFields.includes(key)) {
+                // Update the teacher field
+                teacher[key] = updatedData[key];
+            } else {
                 return response.errorResponse(res, `Field "${key}" is not allowed. You can only update name, address, gender, or subject_name.`);
             }
-        });
+        }
 
-        // Update the teacher in the database
+        // Update the teacher in the model
         const updatedTeacher = teacherModel.updateTeacherById(parseInt(req.params.id), teacher);
 
         if (!updatedTeacher) {
             return response.errorResponse(res, 'An error occurred while updating the teacher.');
         }
 
-        return response.successResponse(res, `Updated teacher with ID ${req.params.id} successfully`, updatedTeacher);
+        return response.successResponse(res, `Updated teacher with ID ${req.params.id} successfully , ` + task, updatedTeacher);
     }
 };
 

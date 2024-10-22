@@ -81,3 +81,19 @@ export const validateStudentUpdate = [
         next();
     }
 ];
+
+export const validateTask = [
+    check('task')
+        .optional()
+        .trim()
+        .matches(/^[a-zA-Z\s]+$/).withMessage('Invalid task: "task" should contain only alphabetic characters.'),
+        
+    // Middleware to handle validation result
+    (req, res, next) => {
+        const errors = validationResult(req);
+        if (!errors.isEmpty()) {
+            return response.errorResponse(res, errors.array().map(error => error.msg).join(', '));
+        }
+        next();
+    }
+];

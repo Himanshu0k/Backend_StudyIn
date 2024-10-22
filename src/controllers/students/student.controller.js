@@ -1,23 +1,7 @@
-/* 
-
--> import student.service from services/student folder
--> there is an object of studentModel which has different functions :-
-1. addStudent - to add the student in the student array
-2. fetchAllStudents - to get all the students present in the student array
-3. fetchStudentById - pass an id , and fetch the data of that particular student
-4. removeStudentById - pass and id, and delete the student with that particular id
-5. updateStudentById - pass an id, and update the details of the student at that particular id
-    NOTE :- YOU CANNOT CHANGE THE ID OF THE STUDENT
-
-*/
 
 import studentModel from '../../services/student/student.services.js';
-
-// import { response.successResponse, response.errorResponse } from '../../libs/response.js';
 import response from '../../libs/response.js';
-
-// Now you can use response.response.successResponse and response.response.errorResponse
-
+import authenticate from '../../libs/middleware/authorization.js'
 
 const studentController = {
     addStudent: (req, res) => { // addstudent function of studentController object
@@ -56,10 +40,16 @@ const studentController = {
 
     fetchStudentById: (req, res) => {
         const student = studentModel.getStudentById(parseInt(req.params.id));
+        let task = req.body.task;
+
         if (!student) {
             response.errorResponse(res, 'Student not found, Invalid student ID');
         }
-        response.successResponse(res, 'Fetched single student details successfully', student);
+        
+        task = authenticate.studentRead(task);
+        
+        response.successResponse(res, 'Fetched single student details successfully , ' + task, student);
+    
     },
 
     removeStudentById: (req, res) => {
@@ -71,8 +61,11 @@ const studentController = {
     },
 
     updateStudentById: (req, res) => {
-        const allowedFields = ['name', 'address', 'gender', 'course_name'];
+        const allowedFields = ['name', 'address', 'gender', 'course_name', 'task'];
         const updatedData = req.body;
+        let task = req.body.task;
+
+        task = authenticate.studentWrite(task);
 
         // Find the student by ID
         const student = studentModel.getStudentById(parseInt(req.params.id));
@@ -106,8 +99,9 @@ const studentController = {
             return response.errorResponse(res, 'An error occurred while updating the student.');
         }
 
-        response.successResponse(res, `Updated student with ID ${req.params.id} successfully`, updatedStudent);
+        response.successResponse(res, `Updated student with ID ${req.params.id} successfully , ` + task, updatedStudent);
     }
 };
 
 export default studentController;
+
