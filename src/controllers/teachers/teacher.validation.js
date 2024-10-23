@@ -1,7 +1,8 @@
 // Validation middleware
 import { check, validationResult } from 'express-validator'; // importing express validator
-
 import response from '../../libs/response.js';
+
+const allowedUpdateFields = ['name', 'address', 'gender', 'subject_name', 'task']; // Define allowed fields for teacher update
 
 // The validateTeacher middleware contains a series of validation checks for the incoming request fields.
 export const validateTeacher = [
@@ -45,31 +46,41 @@ export const validateTeacher = [
   }
 ];
 
-// Middleware to validate student data for updates
 export const validateTeacherUpdate = [
+  // Custom validation to ensure only allowed fields are present in the update request
+  (req, res, next) => {
+      const updateFields = Object.keys(req.body);
+      const invalidFields = updateFields.filter(field => !allowedUpdateFields.includes(field));
+
+      if (invalidFields.length > 0) {
+          return response.errorResponse(res, `Invalid fields: ${invalidFields.join(', ')}. You can only update the following fields: ${allowedUpdateFields.join(', ')}`);
+      }
+      next();
+  },
+
   // Name validation (optional)
   check('name')
-      .optional() // Make this field optional for updates
-      .trim() // Remove leading/trailing whitespace
+      .optional()
+      .trim()
       .isLength({ min: 3 }).withMessage('Invalid name: "name" should be at least 3 characters long.')
       .matches(/^[a-zA-Z\s]+$/).withMessage('Invalid name: "name" should contain only alphabetic characters.'),
 
   // Address validation (optional)
   check('address')
-      .optional() // Make this field optional for updates
+      .optional()
       .trim()
       .isLength({ min: 3 }).withMessage('Invalid address: "address" should be at least 3 characters long.')
       .matches(/^[a-zA-Z0-9\s]+$/).withMessage('Invalid address: "address" should not contain special characters.'),
 
   // Gender validation (optional)
   check('gender')
-      .optional() // Make this field optional for updates
+      .optional()
       .trim()
       .isIn(['male', 'female', 'others']).withMessage('Invalid gender: "gender" should be one of "male", "female", "others".'),
 
-  // Course Name validation (optional)
+  // Subject Name validation (optional)
   check('subject_name')
-      .optional() // Make this field optional for updates
+      .optional()
       .trim()
       .isLength({ min: 3 }).withMessage('Invalid subject_name: "subject_name" should be at least 3 characters long.')
       .matches(/^[a-zA-Z\s]+$/).withMessage('Invalid subject_name: "subject_name" should contain only alphabetic characters.'),

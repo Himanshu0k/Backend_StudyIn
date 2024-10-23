@@ -1,67 +1,4 @@
 
-// const permissionValidator = {
-//     attendance: { read: false, write: false },
-//     timeTable: { read: false, write: false },
-//     notes: { read: false, write: false },
-
-//     studentRead: (data = '') => {
-//         const tasks = ['attendance', 'notes', 'time table'];
-
-//         permissionValidator.attendance.read = true;
-//         permissionValidator.timeTable.read = true;
-//         permissionValidator.notes.read = true;
-
-//         if(tasks.includes(data))
-//             return `You can read the ${data}`;
-//         else
-//             if(data === '')
-//                 return `No task is provided`;
-//             else
-//                 return `You cannot read the ${data}`;
-//     },
-
-//     studentWrite: (res, data = '') => {
-//         if(data === '')
-//             return `No task is provided`;
-//         else 
-//             return `You cannot write the ${data}`;
-//     },
-
-//     teacherRead: (req, res, data = '') => {
-//         const tasks = ['attendance', 'notes', 'time table'];
-
-//         permissionValidator.attendance.read = true;
-//         permissionValidator.notes.read = true;
-//         permissionValidator.timeTable.read = true;
-
-//         if(tasks.includes(data))
-//             return `You can read the ${data}`;
-//         else
-//             if(data === '')
-//                 return `No task is provided`;
-//             else
-//                 return `You cannot read the ${data}`;
-//     },
-
-//     teacherWrite: (req, res, data = '') => {
-//         const tasks = ['attendance', 'notes'];
-
-//         permissionValidator.attendance.write = true;
-//         permissionValidator.notes.write = true;
-
-//         if (tasks.includes(data))
-//             return `You can write the ${data}`;
-//         else
-//             if(data === '')
-//                 return `No task is provided`;
-//             else 
-//                 return `You cannot write the ${data}`;
-//     }
-// };
-
-// export default permissionValidator;
-
-
 const permissionValidator = {
     attendance: { read: false, write: false },
     timeTable: { read: false, write: false },
@@ -77,6 +14,18 @@ const permissionValidator = {
             return `You can read the ${data}`;
         } else {
             return `You cannot read the ${data}`;
+        }
+    },
+
+    handleWritePermission: (data, tasks) => {
+        if (data === '') {
+            return 'No task is provided';
+        }
+
+        if (tasks.includes(data)) {
+            return `You can write the ${data}`;
+        } else {
+            return `You cannot write the ${data}`;
         }
     },
 
@@ -121,7 +70,7 @@ const permissionValidator = {
         permissionValidator.attendance.write = true;
         permissionValidator.notes.write = true;
 
-        return permissionValidator.handleReadPermission(data, tasks);
+        return permissionValidator.handleWritePermission(data, tasks);
     }
 };
 

@@ -57,46 +57,35 @@ const teacherController = {
     },
 
     updateTeacherById: (req, res) => {
-        const allowedFields = ['name', 'address', 'gender', 'subject_name', 'task'];
-        const updatedData = req.body;
-        
-        let task = req.body.task; // Assuming 'task' is part of the request body
-
-        task = authenticate.teacherWrite(task); // Authenticate permissions
-
+        let task = req.body.task;
+        task = authenticate.teacherWrite(task); // Authenticate permissions for task
+    
         // Find the teacher by ID
         const teacher = teacherModel.getTeacherById(parseInt(req.params.id));
         if (!teacher) {
             return response.errorResponse(res, 'Teacher not found, Invalid teacher ID');
         }
-
-        // Validate and update only the fields that are present in the request body
-        for (const key of Object.keys(updatedData)) {
-            // Restrict changes to "id"
-            if (key === 'id') {
-                return response.errorResponse(res, 'You cannot change the id');
+    
+        // Update teacher fields based on the request
+        Object.keys(req.body).forEach(key => {
+            if (req.body[key]) {
+                teacher[key] = req.body[key].trim().toLowerCase(); // Normalize input
             }
-
-            // Validate and update each allowed field
-            if (allowedFields.includes(key)) {
-                updatedData[key] = updatedData[key].trim().toLowerCase(); // Normalize input
-
-                // Update the teacher field
-                teacher[key] = updatedData[key];
-            } else {
-                return response.errorResponse(res, `Field "${key}" is not allowed. You can only update name, address, gender, or subject_name.`);
-            }
-        }
-
-        // Update the teacher in the model
+        });
+    
         const updatedTeacher = teacherModel.updateTeacherById(parseInt(req.params.id), teacher);
-
+    
         if (!updatedTeacher) {
-            return response.errorResponse(res, 'An error occurred while updating the teacher.');
+            return response.errorResponse(res, 'Teacher not found, Invalid teacher ID');
         }
-
-        return response.successResponse(res, `Updated teacher with ID ${req.params.id} successfully , ` + task, updatedTeacher);
+    
+        // Remove 'task' from the updated teacher object before sending the response
+        delete updatedTeacher.task;
+    
+        // Return success response with task message but exclude 'task' from the returned JSON
+        response.successResponse(res, `Updated teacher with ID ${req.params.id} successfully, task: ${task}`, updatedTeacher);
     }
+    
 };
 
 export default teacherController;

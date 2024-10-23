@@ -61,45 +61,30 @@ const studentController = {
     },
 
     updateStudentById: (req, res) => {
-        const allowedFields = ['name', 'address', 'gender', 'course_name', 'task'];
-        const updatedData = req.body;
         let task = req.body.task;
-
         task = authenticate.studentWrite(task);
 
-        // Find the student by ID
         const student = studentModel.getStudentById(parseInt(req.params.id));
         if (!student) {
             return response.errorResponse(res, 'Student not found, Invalid student ID');
         }
 
-        // Validate and update only the fields that are present in the request body
-        for (const key of Object.keys(updatedData)) {
-            // Restrict changes to "id"
-            if (key === 'id') {
-                return response.errorResponse(res, 'You cannot change the id');
+        // Update student fields based on the request
+        Object.keys(req.body).forEach(key => {
+            if (req.body[key]) {
+                student[key] = req.body[key].trim().toLowerCase(); // Normalize input
             }
+        });
 
-            // Validate and update each allowed field
-            if (allowedFields.includes(key)) {
-                updatedData[key] = updatedData[key].trim().toLowerCase(); // Normalize input
-
-                // Update the student field
-                student[key] = updatedData[key];
-            } 
-            else {
-                return response.errorResponse(res, `Field "${key}" is not allowed. You can only update name, address, gender, or course_name.`);
-            }
-        }
-
-        // Update the student in the model
         const updatedStudent = studentModel.updateStudentById(parseInt(req.params.id), student);
 
         if (!updatedStudent) {
-            return response.errorResponse(res, 'An error occurred while updating the student.');
+            return response.errorResponse(res, 'Student not found, Invalid student ID');
         }
 
-        response.successResponse(res, `Updated student with ID ${req.params.id} successfully , ` + task, updatedStudent);
+        delete updatedStudent.task;
+
+        response.successResponse(res, `Updated student with ID ${req.params.id} successfully, ` + task, updatedStudent);
     }
 };
 
