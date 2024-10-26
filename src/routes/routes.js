@@ -18,7 +18,7 @@ router.use("/students", tokenVerification, studentRoutes)
 
 router.use("/teachers", tokenVerification, teacherRoutes)
 
-router.use("/login", loginRoutes)
+router.use("/user", loginRoutes)
 
 router.get('/health', (req, res) => {
    response.successResponse(res, 'server is healthy', new Date().toISOString());

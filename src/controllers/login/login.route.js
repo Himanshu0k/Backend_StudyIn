@@ -15,6 +15,7 @@ import loginController from './login.controller.js';
 import loginValidator from './login.validation.js';
 
 // Define routes
-router.post('/',loginValidator, loginController.login);
+router.post('/login',loginValidator, loginController.login);
+router.post('/signup',loginValidator, loginController.signUp);
 
 export default router;
