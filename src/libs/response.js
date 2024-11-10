@@ -10,6 +10,10 @@ const response = {
         });
     },
     errorResponse: (res, message) => {
+        if (!res || typeof res.status !== 'function') {
+            console.error("Invalid response object passed:", res);
+            throw new Error("Invalid response object in errorResponse");
+        }
         const statusCode = 400;
         return res.status(statusCode).json({
             success: false,

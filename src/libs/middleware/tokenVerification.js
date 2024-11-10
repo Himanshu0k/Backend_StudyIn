@@ -1,35 +1,33 @@
 /* global process */
-
-// verifyToken middleware
-
-import jwt from 'jsonwebtoken';  
-
+import jwt from 'jsonwebtoken';
 import response from '../../libs/response.js';
 
-const verifyToken = (req, res, next) => { // verify token function within the loginController object
-   // used to verify JWT (JSON seb tokens) sent along with the API request
-
+const verifyToken = (req, res, next) => {
    const SECRET_KEY = process.env.SECRET_KEY;
-   const authHeader = req.headers['authorization']; // This header typically contains the JWT token in the format: Bearer <token>.
+   const authHeader = req.headers['authorization']; // This header typically contains the JWT token in the format: Bearer <token>
 
    // Check if the Authorization header exists and contains a token
    if (!authHeader) {
-    //    return res.status(403).json({ status: 403, error: 'Access denied, authorization header missing' });
-       response.errorResponse(res, 'Access denied, authorization header missing')
+       // If there's no token, immediately return an error response
+       return response.errorResponse(res, 'Access denied, authorization header missing');
    }
 
+   // Remove the 'Bearer ' prefix from the token to get the actual JWT
+   const token = authHeader.split(' ')[1]; 
+//    const token = authHeader
+
    // Verify the token
-   jwt.verify(authHeader, SECRET_KEY, (err) => {
-       // Error : if the token is expired 
+   jwt.verify(token, SECRET_KEY, (err, decoded) => {
+       // If an error occurs (e.g., invalid or expired token)
        if (err) {
            console.error("JWT Verification Error: ", err); // Debugging JWT error
-        //    return res.status(403).json({ status: 403, error: 'Invalid token', message: err.message });
-            response.errorResponse(res, 'Invalid Token');
+           return response.errorResponse(res, 'Invalid Token'); // Return the error response immediately
        }
 
-       // Token is valid, proceed with the request
-       console.log("Token verified successfully");
+       // If the token is valid, attach the decoded data to the request object
+       req.user = decoded;  // Now you can access the decoded token payload as req.user
 
+       // Proceed to the next middleware or route handler
        next();
    });
 }
