@@ -1,12 +1,3 @@
-/* 
-
-This file is used for 
--> used to set up routing for the application
--> creating new instance of a express router
--> impoting package of teacher.controller and teacher response from libs folder
--> defining get, patch, delete and post routes
-
-*/
 
 import express from 'express'; // used to set up routing for the application
 const router = express.Router(); // creating new instance of a express router
