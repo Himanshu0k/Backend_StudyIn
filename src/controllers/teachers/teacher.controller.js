@@ -61,14 +61,15 @@ const teacherController = {
      *                 message:
      *                   type: string
      */
-    addTeacher: (req, res) => {
-        const teachers = teacherModel.getAllTeachers(); // Get all teachers
+    addTeacher: async (req, res) => {
+        try {
+        const teachers = await teacherModel.getAllTeachers(); // Get all teachers
         const id = teachers.length > 0 ? Math.max(...teachers.map(t => t.id)) + 1 : 1; // Finding the max ID
 
         let { name, address, gender, subject_name } = req.body;
 
         // Check if teacher with this auto-generated ID already exists
-        if (teacherModel.teacherExists(id)) {
+        if (await teacherModel.teacherExists(id)) {
             return response.errorResponse(res, 'Teacher with this ID already exists');
         }
 
@@ -86,6 +87,10 @@ const teacherController = {
 
         // Respond with success
         return response.successResponse(res, 'Added teacher details successfully', teacher);
+        }
+        catch(error) {
+            return response.errorResponse(res, 'Error adding teacher data : ' + error.message);
+        }
     },
 
     /**
@@ -118,9 +123,14 @@ const teacherController = {
      *                   subject_name:
      *                     type: string
      */
-    fetchAllTeachers: (req, res) => {
-        const teachers = teacherModel.getAllTeachers();
+    fetchAllTeachers: async (req, res) => {
+        try {
+        const teachers = await teacherModel.getAllTeachers();
         return response.successResponse(res, 'Fetched teacher details successfully', teachers);
+        }
+        catch(error) {
+            return response.errorResponse(res, 'Error fetching details of the teachers : ' + error.message);
+        }
     },
 
     /**
@@ -167,8 +177,9 @@ const teacherController = {
      *                 message:
      *                   type: string
      */
-    fetchTeacherById: (req, res) => {
-        const teacher = teacherModel.getTeacherById(parseInt(req.params.id));
+    fetchTeacherById: async (req, res) => {
+        try {
+        const teacher = await teacherModel.getTeacherById(parseInt(req.params.id));
 
         let task = req.body.task; // Assuming 'task' is part of the request body
 
@@ -178,6 +189,10 @@ const teacherController = {
             return response.errorResponse(res, 'Teacher not found, Invalid teacher ID');
         }
         return response.successResponse(res, 'Fetched single teacher details successfully , ' + task, teacher);
+        }
+        catch(error) {
+            return response.errorResponse(res, 'Error fetching teacher data : ' + error.message);
+        }
     },
 
     /**
@@ -209,12 +224,17 @@ const teacherController = {
      *                 message:
      *                   type: string
      */
-    removeTeacherById: (req, res) => {
-        const deletedTeacher = teacherModel.removeTeacherById(parseInt(req.params.id));
+    removeTeacherById: async (req, res) => {
+        try {
+        const deletedTeacher = await teacherModel.removeTeacherById(parseInt(req.params.id));
         if (!deletedTeacher) {
             return response.errorResponse(res, 'Teacher not found, Invalid teacher ID');
         }
         return response.successResponse(res, 'Deleted teacher details successfully', deletedTeacher);
+        }
+        catch(error) {
+            return response.errorResponse(res, 'Error deletinf teacher data : ' + error.message);
+        }
     },
 
     /**
@@ -276,12 +296,13 @@ const teacherController = {
      *                 message:
      *                   type: string
      */
-    updateTeacherById: (req, res) => {
+    updateTeacherById: async (req, res) => {
+        try {
         let task = req.body.task;
         task = authenticate.teacherWrite(task); // Authenticate permissions for task
     
         // Find the teacher by ID
-        const teacher = teacherModel.getTeacherById(parseInt(req.params.id));
+        const teacher = await teacherModel.getTeacherById(parseInt(req.params.id));
         if (!teacher) {
             return response.errorResponse(res, 'Teacher not found, Invalid teacher ID');
         }
@@ -293,7 +314,7 @@ const teacherController = {
             }
         });
     
-        const updatedTeacher = teacherModel.updateTeacherById(parseInt(req.params.id), teacher);
+        const updatedTeacher = await teacherModel.updateTeacherById(parseInt(req.params.id), teacher);
     
         if (!updatedTeacher) {
             return response.errorResponse(res, 'Teacher not found, Invalid teacher ID');
@@ -304,7 +325,12 @@ const teacherController = {
     
         // Return success response with task message but exclude 'task' from the returned JSON
         response.successResponse(res, `Updated teacher with ID ${req.params.id} successfully, task: ${task}`, updatedTeacher);
+        }
+        catch(error) {
+            return response.errorResponse(res, 'Error updating teacher data : ' + error.message);
+        }
     }
+    
 };
 
 export default teacherController;

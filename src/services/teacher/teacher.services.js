@@ -1,43 +1,60 @@
-// models/teacherModel.js
+import Teacher from './teacher.model.js'; // Import the Mongoose Teacher model
 
 class TeacherService {
-   constructor() {
-       this.teachers = []; // In-memory storage for teachers
-   }
+    // Add a new teacher
+    async addTeacher(teacherData) {
+        try {
+            const teacher = new Teacher(teacherData);
+            return await teacher.save(); // Save teacher to the database
+        } catch (error) {
+            throw new Error('Error adding teacher: ' + error.message);
+        }
+    }
 
-   addTeacher(teacher) {
-       this.teachers.push(teacher);
-   }
+    // Get all teachers
+    async getAllTeachers() {
+        try {
+            return await Teacher.find(); // Fetch all teachers
+        } catch (error) {
+            throw new Error('Error fetching teachers: ' + error.message);
+        }
+    }
 
-   getAllTeachers() {
-       return this.teachers;
-   }
+    // Get a teacher by ID
+    async getTeacherById(id) {
+        try {
+            return await Teacher.findOne({id: id}); // Find teacher by ID
+        } catch (error) {
+            throw new Error('Error fetching teacher: ' + error.message);
+        }
+    }
 
-   getTeacherById(id) {
-       return this.teachers.find(teacher => teacher.id === id);
-   }
+    // Remove a teacher by ID
+    async removeTeacherById(id) {
+        try {
+            return await Teacher.findOneAndDelete({id: id}); // Delete teacher by ID
+        } catch (error) {
+            throw new Error('Error removing teacher: ' + error.message);
+        }
+    }
 
-   removeTeacherById(id) {
-       const index = this.teachers.findIndex(teacher => teacher.id === id);
-       if (index !== -1) {
-           return this.teachers.splice(index, 1)[0];
-       }
-       return null;
-   }
+    // Update a teacher by ID
+    async updateTeacherById(id, updatedData) {
+        try {
+            return await Teacher.findOneAndUpdate({id: id}, updatedData, { new: true }); // Update and return the updated teacher
+        } catch (error) {
+            throw new Error('Error updating teacher: ' + error.message);
+        }
+    }
 
-   updateTeacherById(id, updatedData) {
-       const index = this.teachers.findIndex(teacher => teacher.id === id);
-       if (index !== -1) {
-           Object.assign(this.teachers[index], updatedData);
-           return this.teachers[index];
-       }
-       return null;
-   }
-
-   // TODO: move this function to helper
-   teacherExists(id) {
-       return this.teachers.some(teacher => teacher.id === id);
-   }
+    // Check if a teacher exists by ID
+    async teacherExists(id) {
+        try {
+            return await Teacher.findOne({ id: id }); // Check if teacher exists in the database
+        } catch (error) {
+            throw new Error('Error checking teacher existence: ' + error.message);
+        }
+    }
 }
 
-export default new TeacherService(); // Export an instance of the model
+export default new TeacherService(); // Export an instance of the service

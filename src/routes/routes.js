@@ -53,8 +53,16 @@ router.post('/login', loginController.login);
 router.get('/attendence/students', attendanceController.getStudents)
 router.patch('/attendence/updateAttendence', attendanceController.updateStudentAttendance)
 
-// router.use((res) => {
-//    response.errorResponse(res, 'Invalid route. Only "students" and "teachers" endpoint are supported.')
+// router.use( {
+//    response.errorResponse( 'Invalid route. Only "students" and "teachers" endpoint are supported.')
 // });
+
+router.use((req, res) => {
+   try {
+       throw new Error('Route does not exist');
+   } catch (error) {
+       response.errorResponse(res, error.message);
+   }
+});
 
 export default router;

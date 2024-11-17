@@ -128,17 +128,17 @@ import response from '../../libs/response.js';
  */
 
 class AttendanceController {
-    getStudents(req, res) {
+    async getStudents(req, res) {
         const { course_name, teacher_id } = req.body;
 
         // Check if teacher exists
-        const teacherExists = attendanceModel.checkTeacher(teacher_id);
+        const teacherExists = await attendanceModel.checkTeacher(teacher_id);
         if (!teacherExists) {
             return response.errorResponse(res, 'Teacher not found');
         }
 
         // Get students enrolled in the class for the given teacher
-        const studentsInClass = attendanceModel.getStudentsInClass(course_name);
+        const studentsInClass = await attendanceModel.getStudentsInClass(course_name);
 
         if (!studentsInClass || studentsInClass.length === 0) {
             return response.errorResponse(res, 'No students found for this class and teacher');

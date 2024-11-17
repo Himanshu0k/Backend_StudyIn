@@ -3,19 +3,31 @@ import teacherServices from "../teacher/teacher.services.js";
 
 class AttendanceModel {
    // Check if the teacher exists
-   checkTeacher(id) {
-      return teacherServices.teacherExists(id);
+   async checkTeacher(id) {
+      try {
+         return await teacherServices.teacherExists(id); // Check existence in DB
+      } catch (error) {
+         throw new Error("Error checking teacher existence: " + error.message);
+      }
    }
 
-   // Get students enrolled in a specific class taught by a teacher
-   getStudentsInClass(class_name) {
-      return studentServices.getStudentByClassName(class_name);
-  }
-
-   updateStudentAttendance(id, attendence) {
-      return studentServices.updateStudentAttendance(id, attendence);
+   // Get students enrolled in a specific class
+   async getStudentsInClass(className) {
+      try {
+         return await studentServices.getStudentByClassName(className); // Fetch students by class name
+      } catch (error) {
+         throw new Error("Error fetching students in class: " + error.message);
+      }
    }
-  
+
+   // Update student attendance
+   async updateStudentAttendance(id, attendance) {
+      try {
+         return await studentServices.updateStudentAttendance(id, attendance); // Update attendance in DB
+      } catch (error) {
+         throw new Error("Error updating student attendance: " + error.message);
+      }
+   }
 }
 
 const attendanceModel = new AttendanceModel();

@@ -1,57 +1,87 @@
-// models/studentModel.js
+// Import the Student model
+import Student from './student.model.js';
 
 class StudentService {
-    constructor() {
-        this.students = []; // In-memory storage
-    }
-
-    addStudent(student) {
-        this.students.push(student);
-    }
-
-    getAllStudents() {
-        return this.students;
-    }
-
-    getStudentById(id) {
-        return this.students.find(student => student.id === id);
-    }
-
-    getStudentByClassName(class_name) {
-        return this.students.filter(student => student.course_name === class_name);
-    }
-
-    removeStudentById(id) {
-        const index = this.students.findIndex(student => student.id === id);
-        if (index !== -1) {
-            return this.students.splice(index, 1)[0];
+    // Add a new student
+    async addStudent(studentData) {
+        try {
+            const student = new Student(studentData);
+            return await student.save(); // Save to the database
+        } catch (error) {
+            throw new Error('Error adding student: ' + error.message);
         }
-        return null;
     }
 
-    updateStudentById(id, updatedData) {
-        const index = this.students.findIndex(student => student.id === id);
-        if (index !== -1) {
-            Object.assign(this.students[index], updatedData);
-            return this.students[index];
+    // Get all students
+    async getAllStudents() {
+        try {
+            return await Student.find(); // Fetch all students
+        } catch (error) {
+            throw new Error('Error fetching students: ' + error.message);
         }
-        return null;
     }
 
-    updateStudentAttendance(id, attendence) {
-        const student = this.getStudentById(id);
-        if (student) {
-            student.attendence = attendence;
-            
-            return student;
+    // Get a student by ID
+    async getStudentById(id) {
+        try {
+            return await Student.findOne({id: id}); // Find student by ID
+        } catch (error) {
+            throw new Error('Error fetching student: ' + error.message);
         }
-        return null;
     }
 
-    // TODO : move this function to helper
-    studentExists(id) {
-        return this.students.some(student => student.id === id);
+    // Get students by class name
+    async getStudentByClassName(className) {
+        try {
+            return await Student.find({ course_name: className }); // Find students by class
+        } catch (error) {
+            throw new Error('Error fetching students by class: ' + error.message);
+        }
     }
-}
 
-export default new StudentService(); // Export an instance of the model
+    // Remove a student by ID
+    async removeStudentById(id) {
+        try {
+            return await Student.findOneAndDelete({id : id}); // Delete student by ID
+        } catch (error) {
+            throw new Error('Error removing student: ' + error.message);
+        }
+    }
+
+    // Update a student by ID
+    async updateStudentById(id, updatedData) {
+        try {
+            return await Student.findOneAndUpdate({id: id}, updatedData, { new: true }); // Update and return the new document
+        } catch (error) {
+            throw new Error('Error updating student: ' + error.message);
+        }
+    }
+
+    // Update attendance for a student
+    async updateStudentAttendance(id, attendance) {
+        try {
+            const student = await Student.findOneAndUpdate(
+                {id: id},
+                {$set: {attendence: attendance}},
+                {new: true}
+            );
+            if (student) {
+                return await student.save(); // Save changes to the database
+            }
+            return null;
+        } catch (error) {
+            throw new Error('Error updating attendance: ' + error.message);
+        }
+    }
+
+    // Check if a student exists by ID
+    async studentExists(id) {
+        try {
+            return await Student.findOne({ id: id }); // Check existence
+        } catch (error) {
+            throw new Error('Error checking student existence: ' + error.message);
+        }
+    }
+}   
+
+export default new StudentService(); // Export an instance of the service
